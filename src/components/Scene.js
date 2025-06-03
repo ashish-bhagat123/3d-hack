@@ -24,7 +24,13 @@ export class SceneManager {
     this.lighting = setupLighting(this.scene);
     this.stats = setupStats();
     
-    this.gameManager = new GameManager(this.scene, this.physics.world, this.renderer);
+    this.gameManager = new GameManager(
+      this.scene,
+      this.physics.world,
+      this.renderer,
+      this.camera,
+      this.pmrem
+    );
   }
 
   setupRenderer() {

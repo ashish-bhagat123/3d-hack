@@ -1,13 +1,16 @@
-import { TextureLoader, RGBELoader } from 'https://cdn.skypack.dev/three@0.137';
+import { TextureLoader } from 'https://cdn.skypack.dev/three@0.137';
+import { RGBELoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/RGBELoader.js';
 import { HexGrid } from './HexGrid';
 import { SphereManager } from './SphereManager';
-import { InputManager } from './InputManager';
+import { InputManager } from './components/InputManager';
 
 export class GameManager {
-  constructor(scene, physicsWorld, renderer) {
+  constructor(scene, physicsWorld, renderer, camera, pmremGenerator) {
     this.scene = scene;
     this.physicsWorld = physicsWorld;
     this.renderer = renderer;
+    this.camera = camera;
+    this.pmremGenerator = pmremGenerator;
     
     this.init();
   }
@@ -19,12 +22,18 @@ export class GameManager {
     await this.hexGrid.loadMapData();
     
     this.sphereManager = new SphereManager(this.scene, this.physicsWorld, this.envmap);
-    this.inputManager = new InputManager(this.hexGrid, this.sphereManager, this.renderer);
+    this.inputManager = new InputManager(
+      this.camera,
+      this.renderer,
+      this.physicsWorld,
+      this.hexGrid,
+      this.sphereManager
+    );
   }
 
   async loadTextures() {
     const envmapTexture = await new RGBELoader().loadAsync("assets/envmap.hdr");
-    this.envmap = this.pmrem.fromEquirectangular(envmapTexture).texture;
+    this.envmap = this.pmremGenerator.fromEquirectangular(envmapTexture).texture;
 
     const textureLoader = new TextureLoader();
     this.textures = {
